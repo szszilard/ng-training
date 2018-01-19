@@ -18,10 +18,14 @@ export class TaskListItemComponent implements OnInit, OnDestroy {
   public now: number;
   @Input() public task: Task;
   @Input() public disabled: boolean;
+  @Input() public last: boolean;
+  @Input() public first: boolean;
   @Output() public error = new EventEmitter();
   @Output() public delete = new EventEmitter<Task>();
+  @Output() public movedUp = new EventEmitter<Task>();
+  @Output() public movedDown = new EventEmitter<Task>();
 
-  private  _timekeeper: number;
+  private _timekeeper: number;
 
   public constructor(
     private _taskService: TaskService,
@@ -36,11 +40,11 @@ export class TaskListItemComponent implements OnInit, OnDestroy {
       this.now = this._getGmtTime();
     }, 1000);
     jQuery(".colorpicker", this._elementRef.nativeElement).spectrum({
-        color: this.task.color,
-        change: color => {
-          this.task.color = color.toHexString();
-          this.updateTask(this.task);
-        }
+      color: this.task.color,
+      change: color => {
+        this.task.color = color.toHexString();
+        this.updateTask(this.task);
+      }
     });
   }
 
@@ -64,6 +68,14 @@ export class TaskListItemComponent implements OnInit, OnDestroy {
         this.loading = false;
       }
     );
+  }
+
+  public moveUp(task: Task) {
+    this.movedUp.emit(task);
+  }
+
+  public moveDown(task: Task) {
+    this.movedDown.emit(task);
   }
 
   public deleteTask(task: Task) {
